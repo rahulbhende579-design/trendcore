@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore | Create Free Paper-Trading Account{% endblock %}
+
+{% block content %}
+<div class="tc-container" style="padding-top: 2rem; display: flex; justify-content: center;">
+
+  <div style="width: 100%; max-width: 480px;">
+    
+    <!-- Signup Card -->
+    <div class="tc-card" style="padding: 2.25rem 2rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-weight: 800; font-size: 1.5rem; margin-bottom: 0.25rem;">
+          Create your Trend<span style="color: var(--brand-cyan);">Core</span> Account
+        </div>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+          Start trading risk-free with <strong style="color: var(--positive);">₹10,00,000</strong> in virtual funds
+        </p>
+      </div>
+
+      <form method="POST" action="{{ url_for('signup') }}">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" placeholder="Rahul Sharma" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="rahul@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mobile Number</label>
+          <input type="tel" name="mobile" class="form-control" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="tc-grid-2" style="gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" required minlength="6">
+          </div>
+        </div>
+
+        <div style="background-color: var(--bg-surface-secondary); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">
+          ✅ By signing up, you will instantly receive <strong>₹10,00,000</strong> in simulated capital. Paper-trading transactions only.
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          Create Account & Claim ₹10 Lakh Virtual Funds
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+        Already have an account? <a href="{{ url_for('login') }}" style="color: var(--brand-accent); font-weight: 700;">Sign In</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

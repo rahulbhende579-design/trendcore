@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore | Account Login{% endblock %}
+
+{% block content %}
+<div class="tc-container" style="padding-top: 2rem; display: flex; justify-content: center;">
+
+  <div style="width: 100%; max-width: 440px;">
+    
+    <!-- Login Card -->
+    <div class="tc-card" style="padding: 2.25rem 2rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-weight: 800; font-size: 1.5rem; margin-bottom: 0.25rem;">
+          Sign in to Trend<span style="color: var(--brand-cyan);">Core</span>
+        </div>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+          Paper-trading simulation with ₹10,00,000 virtual capital
+        </p>
+      </div>
+
+      <!-- 1-Click Instant Demo Login Banner (Highlight for reviewer) -->
+      <div style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(6, 182, 212, 0.08)); border: 1px solid var(--border-focus); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-accent); text-transform: uppercase; margin-bottom: 0.5rem;">
+          ⚡ Quick Review / Demo Access
+        </div>
+        <a href="{{ url_for('demo_login') }}" class="btn btn-primary btn-block" style="font-weight: 700; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+          Instant Demo Trader Login (₹10L Ready)
+        </a>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <hr style="flex: 1; border: 0; border-top: 1px solid var(--border-subtle);">
+        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">or sign in with password</span>
+        <hr style="flex: 1; border: 0; border-top: 1px solid var(--border-subtle);">
+      </div>
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+          <label class="form-label">Email or Username</label>
+          <input type="text" name="login_id" class="form-control" placeholder="trader@trendcore.com" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label class="form-label" style="margin: 0;">Password</label>
+            <a href="javascript:void(0)" onclick="alert('For this educational demo, use the password: trendcore123')" style="font-size: 0.75rem; color: var(--brand-accent);">Forgot password?</a>
+          </div>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.8125rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-secondary);">
+            <input type="checkbox" name="remember">
+            Remember me
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Pre-seeded accounts cheat sheet -->
+      <div style="margin-top: 1.5rem; padding: 0.75rem; background-color: var(--bg-surface-secondary); border-radius: var(--radius-md); font-size: 0.75rem; color: var(--text-muted); line-height: 1.5;">
+        <div><strong>Trader:</strong> <code>trader@trendcore.com</code> / <code>trendcore123</code></div>
+        <div><strong>Admin:</strong> <code>admin@trendcore.com</code> / <code>admin123</code></div>
+      </div>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+        Don't have an account? <a href="{{ url_for('signup') }}" style="color: var(--brand-accent); font-weight: 700;">Create Account</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

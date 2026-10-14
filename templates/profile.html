@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore | My Profile & Account{% endblock %}
+
+{% block content %}
+<div class="tc-container" style="padding-top: 1.5rem;">
+
+  <!-- Header -->
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.875rem; margin-bottom: 0.25rem;">Trader Profile & Account</h1>
+    <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+      Manage your paper-trading identity, virtual funds, and security settings.
+    </p>
+  </div>
+
+  <div class="tc-main-layout">
+    
+    <!-- Left Column: Settings Forms -->
+    <div>
+      <!-- Profile Information Form Card -->
+      <div class="tc-card" id="account" style="margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.125rem; margin-bottom: 1.25rem;">Personal Details</h2>
+        <form method="POST" action="{{ url_for('profile') }}">
+          <input type="hidden" name="action" value="update_profile">
+
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Address (Read-only)</label>
+            <input type="email" class="form-control" value="{{ user.email }}" disabled style="opacity: 0.7; background: var(--bg-surface-secondary);">
+            <small style="color: var(--text-muted); font-size: 0.75rem;">Account email cannot be modified.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mobile Number</label>
+            <input type="text" name="mobile" class="form-control" value="{{ user.mobile or '' }}" placeholder="+91 9876543210">
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            Save Profile Changes
+          </button>
+        </form>
+      </div>
+
+      <!-- Security / Change Password Form Card -->
+      <div class="tc-card" id="security" style="margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.125rem; margin-bottom: 1.25rem;">Security & Password</h2>
+        <form method="POST" action="{{ url_for('profile') }}">
+          <input type="hidden" name="action" value="change_password">
+
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input type="password" name="old_password" class="form-control" required placeholder="Enter current password">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" name="new_password" class="form-control" required minlength="6" placeholder="At least 6 characters">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <input type="password" name="confirm_password" class="form-control" required placeholder="Repeat new password">
+          </div>
+
+          <button type="submit" class="btn btn-outline">
+            Update Password
+          </button>
+        </form>
+      </div>
+
+      <!-- Reset Simulation Portfolio Card -->
+      <div class="tc-card" id="settings" style="border: 1px solid var(--negative-border);">
+        <h2 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--negative);">Danger Zone: Reset Virtual Funds</h2>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.25rem;">
+          Need a clean slate to test new trading strategies? You can reset your paper trading balance back to <strong>₹10,00,000</strong>. This will clear all existing simulated holdings and cancel any open orders.
+        </p>
+        <button onclick="resetVirtualPortfolio()" class="btn btn-sell">
+          🔄 Reset Portfolio to ₹10,00,000
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column: Account Stats Summary Card -->
+    <div>
+      <div class="tc-card" style="position: sticky; top: 90px;">
+        <div style="text-align: center; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); margin-bottom: 1.25rem;">
+          <div style="width: 64px; height: 64px; border-radius: var(--radius-full); background: linear-gradient(135deg, var(--brand-primary), var(--brand-cyan)); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800; margin: 0 auto 0.75rem;">
+            {{ user.name[0] }}
+          </div>
+          <div style="font-weight: 800; font-size: 1.25rem;">{{ user.name }}</div>
+          <div style="font-size: 0.8125rem; color: var(--text-muted);">{{ user.email }}</div>
+          {% if user.is_admin %}
+            <span style="display: inline-block; margin-top: 0.5rem; font-size: 0.75rem; font-weight: 700; color: var(--brand-cyan); background: var(--brand-cyan-light); padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">
+              ADMINISTRATOR
+            </span>
+          {% endif %}
+        </div>
+
+        <!-- Account Key Statistics -->
+        <div style="display: flex; flex-direction: column; gap: 0.875rem; font-size: 0.875rem;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Paper Balance:</span>
+            <strong class="user-balance-display" style="color: var(--positive);">{{ user.virtual_balance | inr }}</strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Total Trades:</span>
+            <strong>{{ trades_count }} executed</strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Current Holdings:</span>
+            <strong>{{ holdings_count }} stocks</strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Holdings P&L:</span>
+            <strong class="{{ 'text-positive' if overall_pnl >= 0 else 'text-negative' }}">
+              {{ '+' if overall_pnl >= 0 else '' }}{{ overall_pnl | inr }}
+            </strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Member Since:</span>
+            <span style="color: var(--text-muted); font-size: 0.8125rem;">{{ user.created_at[:10] }}</span>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 1.25rem 0;">
+
+        <a href="{{ url_for('logout') }}" class="btn btn-block btn-outline" style="color: var(--negative); border-color: var(--negative-border);">
+          <span>🚪</span> Sign Out
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

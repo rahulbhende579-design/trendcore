@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore | {{ stock.symbol }} - {{ stock.name }}{% endblock %}
+
+{% block content %}
+<div class="tc-container" style="padding-top: 1.5rem;">
+
+  <!-- Stock Header Bar -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <h1 style="font-size: 2rem; margin: 0;">{{ stock.symbol }}</h1>
+        <span style="font-size: 0.8125rem; font-weight: 700; color: var(--brand-primary); background: var(--brand-cyan-light); padding: 0.25rem 0.625rem; border-radius: var(--radius-sm);">
+          {{ stock.exchange or 'NSE / BSE' }}
+        </span>
+        <span style="font-size: 0.8125rem; color: var(--text-muted);">{{ stock.sector }}</span>
+        
+        <!-- Watchlist Star -->
+        {% set is_in_watch = stock.symbol in user_watchlist_symbols %}
+        <button onclick="toggleWatchlist('{{ stock.symbol }}', this)" 
+                style="background:none; border:none; font-size:1.5rem; cursor:pointer; color: {{ '#eab308' if is_in_watch else 'var(--text-muted)' }}; line-height: 1;"
+                title="Toggle Watchlist">
+          {{ '★' if is_in_watch else '☆' }}
+        </button>
+      </div>
+      <div style="font-size: 1rem; color: var(--text-secondary); margin-top: 2px;">{{ stock.name }}</div>
+    </div>
+
+    <!-- Live Price & Change -->
+    <div style="text-align: right;">
+      <div style="font-size: 2rem; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif;">
+        {{ stock.current_price | inr }}
+      </div>
+      <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; font-size: 0.9375rem; font-weight: 700;">
+        <span class="{{ 'text-positive' if stock.change_pct >= 0 else 'text-negative' }}">
+          {{ '+' if stock.change_pct >= 0 else '' }}{{ stock.change_amount | inr }} ({{ '+' if stock.change_pct >= 0 else '' }}{{ stock.change_pct }}%)
+        </span>
+        <span class="{{ 'badge-positive' if stock.change_pct >= 0 else 'badge-negative' }}" style="font-size: 0.75rem;">
+          TODAY
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Trading Layout: Chart + Trading Panel -->
+  <div class="tc-main-layout">
+    
+    <!-- Left Column: Interactive Chart + Key Statistics -->
+    <div>
+      <!-- Chart Card -->
+      <div class="tc-card" style="margin-bottom: 1.5rem;">
+        <!-- Chart Controls Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+          <div style="font-weight: 700; font-size: 0.9375rem; color: var(--text-secondary);">
+            Price Movement
+          </div>
+
+          <!-- Timeframe Selector (1D, 1W, 1M, 3M, 6M, 1Y, 5Y) -->
+          <div class="tc-timeframe-bar">
+            {% for tf in ['1D', '1W', '1M', '3M', '6M', '1Y', '5Y'] %}
+              <button class="tc-timeframe-btn {{ 'active' if tf == '1D' else '' }}"
+                      onclick="switchChartTimeframe('{{ stock.symbol }}', '{{ tf }}', this)">
+                {{ tf }}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Interactive Canvas Container -->
+        <div style="position: relative; height: 380px; width: 100%;">
+          <canvas id="stockChartCanvas"></canvas>
+        </div>
+
+        <!-- Timeframe High/Low Summary -->
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; margin-top: 0.75rem; font-size: 0.8125rem; color: var(--text-secondary);">
+          <div>Period High: <strong id="tfHigh" style="color: var(--text-primary);">{{ stock.day_high | inr }}</strong></div>
+          <div>Period Low: <strong id="tfLow" style="color: var(--text-primary);">{{ stock.day_low | inr }}</strong></div>
+          <div>Period Return: <strong id="tfChange" class="{{ 'text-positive' if stock.change_pct >= 0 else 'text-negative' }}">{{ '+' if stock.change_pct >= 0 else '' }}{{ stock.change_pct }}%</strong></div>
+        </div>
+      </div>
+
+      <!-- Fundamentals & Market Stats Card -->
+      <div class="tc-card" style="margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.125rem; margin-bottom: 1.25rem;">Key Performance Statistics</h2>
+        
+        <!-- 52-Week Range Visual Progress Bar -->
+        <div style="margin-bottom: 1.5rem; background: var(--bg-surface-secondary); padding: 1rem; border-radius: var(--radius-md);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.375rem;">
+            <span>52W Low: <strong>{{ stock.low_52w | inr }}</strong></span>
+            <span style="font-weight: 700; color: var(--brand-accent);">Current: {{ stock.current_price | inr }}</span>
+            <span>52W High: <strong>{{ stock.high_52w | inr }}</strong></span>
+          </div>
+          {% set range_pct = ((stock.current_price - stock.low_52w) / (stock.high_52w - stock.low_52w) * 100) | round %}
+          <div style="width: 100%; height: 8px; background-color: var(--border-subtle); border-radius: var(--radius-full); overflow: hidden; position: relative;">
+            <div style="width: {{ range_pct }}%; height: 100%; background: linear-gradient(90deg, var(--brand-accent), var(--brand-cyan));"></div>
+          </div>
+        </div>
+
+        <div class="tc-grid-3">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Day High</div>
+            <div style="font-weight: 700; font-size: 1rem; margin-top: 2px;">{{ stock.day_high | inr }}</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Day Low</div>
+            <div style="font-weight: 700; font-size: 1rem; margin-top: 2px;">{{ stock.day_low | inr }}</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Market Cap</div>
+            <div style="font-weight: 700; font-size: 1rem; margin-top: 2px;">{{ stock.market_cap }}</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">P/E Ratio</div>
+            <div style="font-weight: 700; font-size: 1rem; margin-top: 2px;">{{ stock.pe_ratio }}</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Daily Volume</div>
+            <div style="font-weight: 700; font-size: 1rem; margin-top: 2px;">{{ stock.volume | string }}</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Industry</div>
+            <div style="font-weight: 700; font-size: 1rem; margin-top: 2px;">{{ stock.sector }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- About Company Card -->
+      <div class="tc-card">
+        <h2 style="font-size: 1.125rem; margin-bottom: 0.75rem;">About {{ stock.name }}</h2>
+        <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.7;">
+          {{ stock.description }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Right Column: Professional Paper Trading Panel -->
+    <div>
+      <div class="tc-trade-panel">
+        
+        <!-- Buy / Sell Segmented Switcher -->
+        <div class="tc-segmented-tabs">
+          <button id="tabBuy" class="tc-segmented-tab active-buy" onclick="setTradeAction('BUY')">
+            BUY
+          </button>
+          <button id="tabSell" class="tc-segmented-tab" onclick="setTradeAction('SELL')">
+            SELL
+          </button>
+        </div>
+
+        <!-- Order Type Selector (Market / Limit) -->
+        <div class="tc-order-type-tabs">
+          <button id="typeMarketBtn" class="tc-order-type-btn active" onclick="setOrderType('MARKET')">
+            Market Order
+          </button>
+          <button id="typeLimitBtn" class="tc-order-type-btn" onclick="setOrderType('LIMIT')">
+            Limit Order
+          </button>
+        </div>
+
+        <!-- Quantity Stepper -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label class="form-label" style="margin: 0;">Quantity (Shares)</label>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Min: 1 share</span>
+          </div>
+          <div class="tc-qty-control">
+            <button class="tc-qty-btn" onclick="changeQty(-1)" title="Decrease Quantity">-</button>
+            <input type="number" id="tradeQty" class="tc-qty-input" value="10" min="1" oninput="recalculateTrade()">
+            <button class="tc-qty-btn" onclick="changeQty(1)" title="Increase Quantity">+</button>
+          </div>
+          <!-- Quick Quantity Chips -->
+          <div class="tc-qty-chips">
+            <button class="tc-chip" onclick="setExactQty(1)">+1</button>
+            <button class="tc-chip" onclick="setExactQty(10)">+10</button>
+            <button class="tc-chip" onclick="setExactQty(50)">+50</button>
+            <button class="tc-chip" onclick="setExactQty(100)">+100</button>
+            <button class="tc-chip" onclick="setMaxQty()" title="Max affordable or held shares">Max</button>
+          </div>
+        </div>
+
+        <!-- Limit Price Input (Hidden unless Limit order is selected) -->
+        <div class="form-group" id="limitPriceGroup" style="display: none;">
+          <label class="form-label">Limit Target Price (₹)</label>
+          <input type="number" id="tradeLimitPrice" class="form-control" step="0.05" value="{{ stock.current_price }}" oninput="recalculateTrade()">
+          <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">
+            Order will execute when market reaches this target.
+          </small>
+        </div>
+
+        <!-- Holdings / Balance Info Box -->
+        <div style="background-color: var(--bg-surface-secondary); padding: 0.875rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.375rem;">
+            <span id="tradeActionLabel" style="color: var(--text-secondary);">Available Virtual Balance:</span>
+            <strong class="user-balance-display" style="color: var(--brand-accent);">{{ user_balance | inr }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8125rem;">
+            <span style="color: var(--text-secondary);">Current Position:</span>
+            <strong>
+              {% if user_holding %}
+                {{ user_holding.quantity }} shares @ {{ user_holding.avg_buy_price | inr }}
+              {% else %}
+                0 shares
+              {% endif %}
+            </strong>
+          </div>
+        </div>
+
+        <!-- Estimated Amount Calculation Display -->
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-secondary);">Estimated Amount:</span>
+            <span id="estimatedAmountText" style="font-size: 1.35rem; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-primary);">
+              ₹0.00
+            </span>
+          </div>
+          <!-- Warning validation message -->
+          <div id="tradeWarningText" style="color: var(--negative); font-size: 0.8125rem; font-weight: 600; margin-top: 0.5rem; display: none;"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="tradeSubmitBtn" class="btn btn-buy btn-block btn-lg" onclick="executeTrade()">
+          BUY {{ stock.symbol }}
+        </button>
+
+        <!-- Paper Trading Disclaimer -->
+        <div style="margin-top: 1rem; font-size: 0.6875rem; color: var(--text-muted); text-align: center; line-height: 1.4;">
+          🔒 Virtual simulation order. No real money will be charged or withdrawn.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.TC_STOCK_SYMBOL = "{{ stock.symbol }}";
+  window.TC_CURRENT_PRICE = {{ stock.current_price }};
+  window.TC_USER_BALANCE = {{ user_balance }};
+  window.TC_USER_HOLDING_QTY = {{ user_holding.quantity if user_holding else 0 }};
+
+  // Render initial chart
+  document.addEventListener('DOMContentLoaded', function() {
+    const initialData = {{ initial_chart | tojson }};
+    renderStockChart('stockChartCanvas', initialData);
+    recalculateTrade();
+  });
+</script>
+{% endblock %}

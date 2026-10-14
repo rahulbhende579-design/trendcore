@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore | All Stocks Directory (NSE & BSE){% endblock %}
+
+{% block content %}
+<div class="tc-container" style="padding-top: 1.5rem;">
+
+  <!-- Header -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span style="font-size: 0.75rem; font-weight: 700; color: var(--brand-accent); background: var(--bg-surface-secondary); padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">
+          OFFICIAL INSTRUMENT MASTER
+        </span>
+        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">
+          {{ total_count | default(stocks | length) }} Stocks Available
+        </span>
+      </div>
+      <h1 style="font-size: 1.875rem; margin-bottom: 0.25rem;">Indian Markets Directory</h1>
+      <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+        Comprehensive searchable directory of all equities listed on National Stock Exchange (NSE) and Bombay Stock Exchange (BSE).
+      </p>
+    </div>
+
+    <!-- Exchange Filter Pills -->
+    <div style="display: flex; gap: 0.5rem; background: var(--bg-surface-secondary); padding: 0.25rem; border-radius: var(--radius-md);">
+      <a href="{{ url_for('markets', sector=current_sector, exchange='all', q=search_query, sort=current_sort) }}"
+         class="btn btn-sm {{ 'btn-primary' if current_exchange == 'all' else 'btn-outline' }}" style="border:none;">
+        All Exchanges
+      </a>
+      <a href="{{ url_for('markets', sector=current_sector, exchange='NSE', q=search_query, sort=current_sort) }}"
+         class="btn btn-sm {{ 'btn-primary' if current_exchange == 'NSE' else 'btn-outline' }}" style="border:none;">
+        NSE
+      </a>
+      <a href="{{ url_for('markets', sector=current_sector, exchange='BSE', q=search_query, sort=current_sort) }}"
+         class="btn btn-sm {{ 'btn-primary' if current_exchange == 'BSE' else 'btn-outline' }}" style="border:none;">
+        BSE
+      </a>
+    </div>
+  </div>
+
+  <!-- Search, Sort & Sector Filter Controls -->
+  <div class="tc-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      
+      <!-- Top Row: Search and Sort -->
+      <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+        
+        <!-- Search Input -->
+        <form method="GET" action="{{ url_for('markets') }}" style="display: flex; gap: 0.5rem; flex: 1; min-width: 280px; max-width: 480px;">
+          <input type="hidden" name="sector" value="{{ current_sector }}">
+          <input type="hidden" name="exchange" value="{{ current_exchange }}">
+          <input type="hidden" name="sort" value="{{ current_sort }}">
+          <input type="text" name="q" value="{{ search_query }}" class="form-control" style="padding: 0.45rem 0.85rem; font-size: 0.875rem;" placeholder="Search all 5,700+ stocks by name or symbol...">
+          <button type="submit" class="btn btn-sm btn-primary">Search</button>
+          {% if search_query or current_sector != 'all' or current_exchange != 'all' %}
+            <a href="{{ url_for('markets') }}" class="btn btn-sm btn-outline" title="Reset all filters">Clear</a>
+          {% endif %}
+        </form>
+
+        <!-- Sorting Dropdown -->
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); white-space: nowrap;">Sort by:</span>
+          <select onchange="location = this.value;" class="form-control" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.8125rem;">
+            <option value="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort='volume_desc') }}" {{ 'selected' if current_sort == 'volume_desc' }}>Highest Volume / Mover</option>
+            <option value="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort='symbol_asc') }}" {{ 'selected' if current_sort == 'symbol_asc' }}>Symbol (A to Z)</option>
+            <option value="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort='symbol_desc') }}" {{ 'selected' if current_sort == 'symbol_desc' }}>Symbol (Z to A)</option>
+            <option value="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort='price_desc') }}" {{ 'selected' if current_sort == 'price_desc' }}>Price (High to Low)</option>
+            <option value="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort='price_asc') }}" {{ 'selected' if current_sort == 'price_asc' }}>Price (Low to High)</option>
+            <option value="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort='change_desc') }}" {{ 'selected' if current_sort == 'change_desc' }}>Top Gainers (%)</option>
+            <option value="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort='change_asc') }}" {{ 'selected' if current_sort == 'change_asc' }}>Top Losers (%)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Bottom Row: Sector Filters -->
+      <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; max-width: 100%;">
+        {% for sec in sectors %}
+          <a href="{{ url_for('markets', sector=sec, exchange=current_exchange, q=search_query, sort=current_sort) }}" 
+             class="btn btn-sm {{ 'btn-primary' if current_sector == sec or (sec == 'All' and current_sector == 'all') else 'btn-outline' }}"
+             style="white-space: nowrap; font-size: 0.8125rem;">
+            {{ sec }}
+          </a>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Stocks Table Card -->
+  <div class="tc-card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem;">
+    {% if stocks %}
+      <div class="table-responsive">
+        <table class="tc-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th>Stock & Company</th>
+              <th>Exchange</th>
+              <th>Sector</th>
+              <th>Current Price</th>
+              <th>Day Change</th>
+              <th>Day Low / High</th>
+              <th>52W Low / High</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in stocks %}
+              {% set is_in_watch = s.symbol in user_watchlist_symbols %}
+              <tr>
+                <!-- Watchlist Star -->
+                <td>
+                  <button onclick="toggleWatchlist('{{ s.symbol }}', this)" 
+                          style="background:none; border:none; font-size:1.25rem; cursor:pointer; color: {{ '#eab308' if is_in_watch else 'var(--text-muted)' }}; line-height: 1;"
+                          title="{{ 'Remove from Watchlist' if is_in_watch else 'Add to Watchlist' }}">
+                    {{ '★' if is_in_watch else '☆' }}
+                  </button>
+                </td>
+
+                <!-- Stock & Company Name -->
+                <td>
+                  <a href="{{ url_for('stock_detail', symbol=s.symbol) }}" style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 700; font-size: 0.9375rem; color: var(--text-primary);">{{ s.symbol }}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.name }}</span>
+                  </a>
+                </td>
+
+                <!-- Exchange Badge -->
+                <td>
+                  <span style="font-size: 0.75rem; font-weight: 700; color: var(--brand-primary); background: var(--brand-cyan-light); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); white-space: nowrap;">
+                    {{ s.exchange or 'NSE/BSE' }}
+                  </span>
+                </td>
+
+                <!-- Sector -->
+                <td>
+                  <span style="font-size: 0.8125rem; color: var(--text-secondary); background: var(--bg-surface-secondary); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); white-space: nowrap;">
+                    {{ s.sector }}
+                  </span>
+                </td>
+
+                <!-- Current Price -->
+                <td>
+                  <span style="font-weight: 700; font-size: 1rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    {{ s.current_price | inr }}
+                  </span>
+                </td>
+
+                <!-- Day Change -->
+                <td>
+                  <div class="{{ 'text-positive' if s.change_pct >= 0 else 'text-negative' }}" style="font-weight: 700; font-size: 0.875rem;">
+                    {{ '+' if s.change_pct >= 0 else '' }}{{ s.change_amount | inr }}
+                  </div>
+                  <div class="{{ 'badge-positive' if s.change_pct >= 0 else 'badge-negative' }}" style="margin-top: 2px;">
+                    {{ '+' if s.change_pct >= 0 else '' }}{{ s.change_pct }}%
+                  </div>
+                </td>
+
+                <!-- Day Low / High -->
+                <td style="font-size: 0.8125rem; white-space: nowrap;">
+                  <div><span style="color: var(--text-muted);">L:</span> {{ s.day_low | inr }}</div>
+                  <div><span style="color: var(--text-muted);">H:</span> {{ s.day_high | inr }}</div>
+                </td>
+
+                <!-- 52W Low / High -->
+                <td style="font-size: 0.8125rem; white-space: nowrap;">
+                  <div><span style="color: var(--text-muted);">L:</span> {{ s.low_52w | inr }}</div>
+                  <div><span style="color: var(--text-muted);">H:</span> {{ s.high_52w | inr }}</div>
+                </td>
+
+                <!-- Action Button -->
+                <td style="text-align: right; white-space: nowrap;">
+                  <a href="{{ url_for('stock_detail', symbol=s.symbol) }}" class="btn btn-sm btn-primary">
+                    Trade / Chart
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="tc-empty-state" style="padding: 3rem 1.5rem; text-align: center;">
+        <div class="tc-empty-icon" style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">No Stocks Found</h2>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+          No stocks matched your search query "<strong>{{ search_query }}</strong>" or selected filters.
+        </p>
+        <a href="{{ url_for('markets') }}" class="btn btn-primary btn-sm">Clear All Filters</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Pagination Controls -->
+  {% if total_pages and total_pages > 1 %}
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 3rem;">
+      <div style="font-size: 0.875rem; color: var(--text-muted);">
+        Showing Page <strong>{{ page }}</strong> of <strong>{{ total_pages }}</strong> ({{ total_count }} total stocks)
+      </div>
+
+      <div style="display: flex; gap: 0.35rem; align-items: center;">
+        <!-- Previous Page -->
+        {% if page > 1 %}
+          <a href="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort=current_sort, page=page-1) }}" class="btn btn-sm btn-outline">
+            &larr; Prev
+          </a>
+        {% endif %}
+
+        <!-- First Page Link if far -->
+        {% if page > 3 %}
+          <a href="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort=current_sort, page=1) }}" class="btn btn-sm btn-outline">1</a>
+          <span style="color: var(--text-muted); padding: 0 0.25rem;">...</span>
+        {% endif %}
+
+        <!-- Window of page numbers -->
+        {% for p in range(1, total_pages + 1) %}
+          {% if p >= page - 2 and p <= page + 2 %}
+            <a href="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort=current_sort, page=p) }}"
+               class="btn btn-sm {{ 'btn-primary' if p == page else 'btn-outline' }}">
+              {{ p }}
+            </a>
+          {% endif %}
+        {% endfor %}
+
+        <!-- Last Page Link if far -->
+        {% if page < total_pages - 2 %}
+          <span style="color: var(--text-muted); padding: 0 0.25rem;">...</span>
+          <a href="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort=current_sort, page=total_pages) }}" class="btn btn-sm btn-outline">{{ total_pages }}</a>
+        {% endif %}
+
+        <!-- Next Page -->
+        {% if page < total_pages %}
+          <a href="{{ url_for('markets', sector=current_sector, exchange=current_exchange, q=search_query, sort=current_sort, page=page+1) }}" class="btn btn-sm btn-outline">
+            Next &rarr;
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
