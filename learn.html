@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore Learn | Stock Market & Trading Academy{% endblock %}
+
+{% block content %}
+<div class="tc-container" style="padding-top: 1.5rem;">
+
+  <!-- Hero Header -->
+  <div style="text-align: center; max-width: 760px; margin: 0 auto 3rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; background: var(--brand-cyan-light); color: var(--brand-primary); border-radius: var(--radius-full); font-size: 0.8125rem; font-weight: 700; margin-bottom: 1rem;">
+      🎓 TrendCore Academy
+    </div>
+    <h1 style="font-size: 2.25rem; margin-bottom: 0.75rem;">TrendCore Learn</h1>
+    <p style="font-size: 1.05rem; color: var(--text-secondary); line-height: 1.6;">
+      Master Indian equity markets from ground up. Learn fundamental concepts, order types, investment vehicles, and essential risk management principles.
+    </p>
+  </div>
+
+  <!-- Category 1: Stock Market Basics -->
+  <section id="basics" style="margin-bottom: 3.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+      <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent)); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+        🏛️
+      </div>
+      <div>
+        <h2 style="font-size: 1.5rem;">1. Stock Market Basics</h2>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">Foundational pillars of the Indian financial ecosystem</p>
+      </div>
+    </div>
+
+    <div class="tc-grid-3">
+      <!-- What is a stock? -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">What is a Stock?</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          A stock (or share/equity) represents fractional ownership in a corporation. When you buy a share of Reliance or TCS, you literally own a piece of that enterprise and participate in its growth through capital gains and dividends.
+        </p>
+      </div>
+
+      <!-- What is NSE? -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">What is NSE?</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          The <strong>National Stock Exchange (NSE)</strong> is India’s largest electronic financial exchange located in Mumbai. Established in 1992, it pioneered modern computerized screen-based trading and is known worldwide for massive derivative volumes.
+        </p>
+      </div>
+
+      <!-- What is BSE? -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">What is BSE?</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          The <strong>Bombay Stock Exchange (BSE)</strong>, founded in 1875 at Dalal Street, is Asia's oldest stock exchange. Over 5,000 companies are listed on BSE, offering unparalleled corporate breadth and trading heritage.
+        </p>
+      </div>
+
+      <!-- What is NIFTY? -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">What is NIFTY 50?</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          The <strong>NIFTY 50</strong> is the flagship benchmark index of the NSE. It tracks the weighted performance of the top 50 blue-chip Indian companies across 13 economic sectors, acting as the pulse of the Indian economy.
+        </p>
+      </div>
+
+      <!-- What is SENSEX? -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">What is SENSEX?</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          The <strong>S&P BSE SENSEX</strong> is a basket of 30 financially sound, heavily traded companies listed on the BSE. It is calculated using free-float market capitalization methodology and reflects overall market sentiment.
+        </p>
+      </div>
+
+      <!-- Trading Hours -->
+      <div class="tc-card" style="background: var(--bg-surface-secondary);">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">Indian Market Hours</h3>
+        <ul style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.8; list-style-position: inside;">
+          <li><strong>Pre-market:</strong> 09:00 AM - 09:15 AM</li>
+          <li><strong>Regular Trading:</strong> 09:15 AM - 03:30 PM</li>
+          <li><strong>Post-market:</strong> 03:40 PM - 04:00 PM</li>
+          <li>Trading days: Monday to Friday (excluding national holidays)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category 2: Trading Basics -->
+  <section id="orders" style="margin-bottom: 3.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+      <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--positive), var(--brand-cyan)); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+        ⚡
+      </div>
+      <div>
+        <h2 style="font-size: 1.5rem;">2. Trading Basics & Order Types</h2>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">Mastering market execution, order mechanics, and trade durations</p>
+      </div>
+    </div>
+
+    <div class="tc-grid-2">
+      <!-- Market Order -->
+      <div class="tc-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <h3 style="font-size: 1.125rem; color: var(--positive);">Market Order</h3>
+          <span style="font-size: 0.75rem; font-weight: 700; background: var(--positive-bg); color: var(--positive); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">Instant Fill</span>
+        </div>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem;">
+          An instruction to buy or sell immediately at the best available current market price. Prioritizes execution speed over price certainty.
+        </p>
+        <div style="background-color: var(--bg-surface-secondary); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.8125rem; color: var(--text-secondary);">
+          <strong>When to use:</strong> When you need your trade filled right now and the stock has high trading liquidity.
+        </div>
+      </div>
+
+      <!-- Limit Order -->
+      <div class="tc-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <h3 style="font-size: 1.125rem; color: var(--brand-accent);">Limit Order</h3>
+          <span style="font-size: 0.75rem; font-weight: 700; background: var(--brand-cyan-light); color: var(--brand-primary); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">Price Control</span>
+        </div>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem;">
+          An order to buy at or below a specified target price, or sell at or above a target price. Guarantees price but does not guarantee execution if the market never touches your target.
+        </p>
+        <div style="background-color: var(--bg-surface-secondary); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.8125rem; color: var(--text-secondary);">
+          <strong>When to use:</strong> When you are waiting for a pullback or refuse to buy above a disciplined ceiling.
+        </div>
+      </div>
+
+      <!-- Stop Loss -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--negative);">Stop Loss (SL)</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem;">
+          A conditional safety order designed to limit an investor's loss on an existing position. If the stock drops to your predetermined trigger price, the order activates to automatically exit the trade and protect your remaining capital.
+        </p>
+        <div style="background-color: var(--bg-surface-secondary); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.8125rem; color: var(--text-secondary);">
+          <strong>Golden Rule:</strong> Never enter a short-term trade without knowing your stop-loss exit in advance.
+        </div>
+      </div>
+
+      <!-- Intraday vs Delivery -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">Intraday vs. Delivery</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem;">
+          <strong>Intraday (MIS):</strong> Positions entered and squared off on the exact same trading day before 03:20 PM.
+        </p>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          <strong>Delivery (CNC):</strong> Shares purchased and held in your Demat account for multiple days, months, or years for long-term wealth creation.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category 3: Investment Basics -->
+  <section id="investing" style="margin-bottom: 3.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+      <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--brand-primary), var(--brand-cyan)); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+        🌱
+      </div>
+      <div>
+        <h2 style="font-size: 1.5rem;">3. Investment Basics & Risk Management</h2>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">Strategies for sustainable, long-term capital compounding</p>
+      </div>
+    </div>
+
+    <div class="tc-grid-3">
+      <!-- SIP -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">Systematic Investment Plan (SIP)</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          SIP allows investing a fixed sum periodically (e.g. monthly) into mutual funds or stocks. It enforces financial discipline and leverages <strong>Rupee Cost Averaging</strong> (buying more units when prices dip and fewer when prices peak).
+        </p>
+      </div>
+
+      <!-- Mutual Funds -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">Mutual Funds</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          A pooled investment vehicle managed by professional Asset Management Companies (AMCs) and SEBI-registered fund managers who allocate capital across diverse equities and debt securities.
+        </p>
+      </div>
+
+      <!-- ETFs -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-accent);">Exchange Traded Funds (ETFs)</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          Marketable securities that track an underlying index (like NIFTYBEES for NIFTY 50). ETFs trade live on exchanges just like regular stocks with ultra-low expense ratios and high transparency.
+        </p>
+      </div>
+
+      <!-- Diversification -->
+      <div class="tc-card">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--positive);">Portfolio Diversification</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          The technique of spreading investments across sectors (IT, Banking, FMCG, Energy) to reduce non-systematic risk. If one sector undergoes a cyclical downturn, other sectors mitigate the impact.
+        </p>
+      </div>
+
+      <!-- Risk Management -->
+      <div class="tc-card" style="grid-column: span 2;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--brand-primary);">Disciplined Risk Management</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.5rem;">
+          In trading, capital preservation always precedes profit maximization. Key guidelines:
+        </p>
+        <ul style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.8; list-style-position: inside;">
+          <li><strong>The 1-2% Rule:</strong> Never risk more than 1-2% of your total portfolio on any single trade.</li>
+          <li><strong>Risk-to-Reward Ratio:</strong> Only take trades with at least a 1:2 risk-to-reward ratio.</li>
+          <li><strong>Emotional Detachment:</strong> Never let fear or greed override your trading thesis.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Quiz / Knowledge Check Section -->
+  <section class="tc-card" style="margin-bottom: 3rem; background: linear-gradient(135deg, var(--bg-surface), var(--bg-surface-secondary));">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <span style="font-size: 1.5rem;">🎯</span>
+      <h2 style="font-size: 1.35rem; margin-top: 0.25rem;">Test Your Trading Knowledge</h2>
+      <p style="font-size: 0.875rem; color: var(--text-secondary);">Interactive quick quiz for TrendCore paper traders</p>
+    </div>
+
+    <div id="quizContainer" style="max-width: 600px; margin: 0 auto;">
+      <div style="font-weight: 700; font-size: 1rem; margin-bottom: 1rem;" id="quizQuestion">
+        Question: Which benchmark index tracks the 50 largest blue-chip Indian companies on NSE?
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;" id="quizOptions">
+        <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;" onclick="checkQuiz(0)">A) SENSEX</button>
+        <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;" onclick="checkQuiz(1)">B) NIFTY 50</button>
+        <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;" onclick="checkQuiz(2)">C) BANK NIFTY</button>
+      </div>
+      <div id="quizFeedback" style="margin-top: 1rem; font-weight: 700; font-size: 0.9375rem; text-align: center; display: none;"></div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function checkQuiz(selectedIndex) {
+    const feedback = document.getElementById('quizFeedback');
+    feedback.style.display = 'block';
+    if (selectedIndex === 1) {
+      feedback.className = 'text-positive';
+      feedback.textContent = '🎉 Correct! NIFTY 50 tracks the 50 largest blue-chips on the National Stock Exchange.';
+      showToast("Quiz Passed!", "Great job! You know your Indian market benchmarks.", "success");
+    } else {
+      feedback.className = 'text-negative';
+      feedback.textContent = '❌ Incorrect. The correct answer is B) NIFTY 50.';
+    }
+  }
+</script>
+{% endblock %}

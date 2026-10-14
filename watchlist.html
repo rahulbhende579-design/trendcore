@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore | My Watchlist{% endblock %}
+
+{% block content %}
+<div class="tc-container" style="padding-top: 1.5rem;">
+
+  <!-- Header -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+    <div>
+      <h1 style="font-size: 1.875rem; margin-bottom: 0.25rem;">My Watchlist</h1>
+      <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+        Monitor real-time prices and price movements for your shortlisted Indian stocks.
+      </p>
+    </div>
+
+    <!-- Quick Add Stock To Watchlist Dropdown/Form -->
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <select id="quickAddStockSelect" class="form-control" style="width: auto; padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+        <option value="">+ Add stock to watchlist...</option>
+        {% for s in all_stocks %}
+          <option value="{{ s.symbol }}">{{ s.symbol }} - {{ s.name }}</option>
+        {% endfor %}
+      </select>
+      <button onclick="addSelectedToWatchlist()" class="btn btn-primary btn-sm">
+        Add
+      </button>
+    </div>
+  </div>
+
+  <!-- Watchlist Table Card -->
+  <div class="tc-card" style="padding: 0; overflow: hidden;">
+    {% if watchlist_items %}
+      <div class="table-responsive">
+        <table class="tc-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th>Stock</th>
+              <th>Sector</th>
+              <th>Price</th>
+              <th>Day Change</th>
+              <th>Day Range</th>
+              <th>52W Range</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in watchlist_items %}
+              <tr>
+                <td>
+                  <button onclick="toggleWatchlist('{{ item.stock_symbol }}', this); setTimeout(() => window.location.reload(), 600);"
+                          style="background:none; border:none; font-size:1.25rem; cursor:pointer; color: #eab308; line-height: 1;"
+                          title="Remove from Watchlist">
+                    ★
+                  </button>
+                </td>
+                <td>
+                  <a href="{{ url_for('stock_detail', symbol=item.stock_symbol) }}" style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 700; color: var(--brand-accent); font-size: 0.9375rem;">{{ item.stock_symbol }}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">{{ item.name }}</span>
+                  </a>
+                </td>
+                <td>
+                  <span style="font-size: 0.8125rem; color: var(--text-secondary); background: var(--bg-surface-secondary); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">
+                    {{ item.sector }}
+                  </span>
+                </td>
+                <td>
+                  <span style="font-weight: 700; font-size: 1rem;">{{ item.current_price | inr }}</span>
+                </td>
+                <td>
+                  <div class="{{ 'text-positive' if item.change_pct >= 0 else 'text-negative' }}" style="font-weight: 700;">
+                    {{ '+' if item.change_pct >= 0 else '' }}{{ item.change_amount | inr }}
+                  </div>
+                  <div class="{{ 'badge-positive' if item.change_pct >= 0 else 'badge-negative' }}" style="font-size: 0.75rem; margin-top: 2px;">
+                    {{ '+' if item.change_pct >= 0 else '' }}{{ item.change_pct }}%
+                  </div>
+                </td>
+                <td style="font-size: 0.8125rem;">
+                  <div><span style="color: var(--text-muted);">L:</span> {{ item.day_low | inr }}</div>
+                  <div><span style="color: var(--text-muted);">H:</span> {{ item.day_high | inr }}</div>
+                </td>
+                <td style="font-size: 0.8125rem;">
+                  <div><span style="color: var(--text-muted);">L:</span> {{ item.low_52w | inr }}</div>
+                  <div><span style="color: var(--text-muted);">H:</span> {{ item.high_52w | inr }}</div>
+                </td>
+                <td style="text-align: right;">
+                  <div style="display: inline-flex; gap: 0.5rem;">
+                    <a href="{{ url_for('stock_detail', symbol=item.stock_symbol) }}" class="btn btn-sm btn-buy">
+                      Buy
+                    </a>
+                    <a href="{{ url_for('stock_detail', symbol=item.stock_symbol) }}" class="btn btn-sm btn-outline">
+                      Chart
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="tc-empty-state">
+        <div class="tc-empty-icon">⭐</div>
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Your Watchlist is Empty</h2>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+          Click the star icon (☆) next to any stock to add it to your watchlist for quick tracking.
+        </p>
+        <a href="{{ url_for('markets') }}" class="btn btn-primary">
+          Explore Markets
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function addSelectedToWatchlist() {
+    const select = document.getElementById('quickAddStockSelect');
+    const symbol = select.value;
+    if (!symbol) return;
+    toggleWatchlist(symbol);
+    setTimeout(() => window.location.reload(), 600);
+  }
+</script>
+{% endblock %}

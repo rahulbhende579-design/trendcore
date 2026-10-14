@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore | Paper Trading Platform - Trade. Learn. Grow.{% endblock %}
+
+{% block content %}
+<div class="tc-container">
+  <!-- Hero Section -->
+  <section style="padding: 4rem 0 3rem; text-align: center; max-width: 860px; margin: 0 auto;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 1rem; background-color: var(--brand-cyan-light); color: var(--brand-primary); border-radius: var(--radius-full); font-size: 0.8125rem; font-weight: 700; margin-bottom: 1.5rem;">
+      <span>🚀</span> Live Indian Stock Market Paper-Trading Simulator
+    </div>
+    
+    <h1 style="font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.15; margin-bottom: 1.25rem;">
+      Master Stock Trading With <span style="background: linear-gradient(135deg, var(--brand-accent), var(--brand-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₹10,00,000</span> Virtual Funds
+    </h1>
+    
+    <p style="font-size: 1.125rem; color: var(--text-secondary); max-width: 680px; margin: 0 auto 2rem; line-height: 1.6;">
+      Practice buying and selling premier NSE & BSE equities, test trading strategies in real market conditions, and track your portfolio with zero financial risk.
+    </p>
+
+    <!-- Prominent Demo Action Banner -->
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem;">
+      <a href="{{ url_for('demo_login') }}" class="btn btn-primary btn-lg" style="box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35); font-size: 1.05rem;">
+        ⚡ Instant Demo Trader (₹10,00,000 Ready)
+      </a>
+      <a href="{{ url_for('signup') }}" class="btn btn-outline btn-lg" style="font-size: 1.05rem;">
+        Create Free Account
+      </a>
+      <a href="{{ url_for('markets') }}" class="btn btn-outline btn-lg" style="font-size: 1.05rem;">
+        Explore Markets
+      </a>
+    </div>
+
+    <!-- Quick Credentials Helper for Evaluation -->
+    <div style="display: inline-flex; align-items: center; gap: 1rem; padding: 0.75rem 1.25rem; background-color: var(--bg-surface-secondary); border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); font-size: 0.8125rem; color: var(--text-secondary);">
+      <span>💡 <strong>Quick Demo Access:</strong></span>
+      <span>Trader: <code>trader@trendcore.com</code> / <code>trendcore123</code></span>
+      <span>•</span>
+      <span>Admin: <code>admin@trendcore.com</code> / <code>admin123</code></span>
+    </div>
+  </section>
+
+  <!-- Market Overview Indices Cards -->
+  <section style="margin-bottom: 3.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h2>Market Indices</h2>
+      <a href="{{ url_for('markets') }}" style="color: var(--brand-accent); font-weight: 600; font-size: 0.875rem;">View All Markets &rarr;</a>
+    </div>
+
+    <div class="tc-grid-4">
+      {% for idx in indices %}
+        <div class="tc-card tc-card-interactive">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <div>
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">INDEX</div>
+              <div style="font-weight: 700; font-size: 1.125rem;">{{ idx.name }}</div>
+            </div>
+            <span class="{{ 'badge-positive' if idx.is_positive else 'badge-negative' }}">
+              {{ idx.change_pct }}
+            </span>
+          </div>
+          <div style="font-size: 1.5rem; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif;">
+            ₹{{ idx.price }}
+          </div>
+          <div style="font-size: 0.8125rem; margin-top: 0.25rem;" class="{{ 'text-positive' if idx.is_positive else 'text-negative' }}">
+            {{ idx.change }} today
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Popular Indian Stocks Preview -->
+  <section style="margin-bottom: 3.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <div>
+        <h2>Trending Equities</h2>
+        <p style="font-size: 0.875rem; color: var(--text-secondary);">Top high-volume stocks on NSE & BSE</p>
+      </div>
+      <a href="{{ url_for('markets') }}" class="btn btn-outline btn-sm">Full Markets Directory</a>
+    </div>
+
+    <div class="tc-card" style="padding: 0; overflow: hidden;">
+      <div class="table-responsive">
+        <table class="tc-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Sector</th>
+              <th>Current Price</th>
+              <th>24h Change</th>
+              <th>Day Range</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for stock in featured_stocks %}
+              <tr>
+                <td>
+                  <a href="{{ url_for('stock_detail', symbol=stock.symbol) }}" style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 700; font-size: 0.9375rem; color: var(--text-primary);">{{ stock.symbol }}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">{{ stock.name }}</span>
+                  </a>
+                </td>
+                <td>
+                  <span style="font-size: 0.8125rem; color: var(--text-secondary);">{{ stock.sector }}</span>
+                </td>
+                <td>
+                  <span style="font-weight: 700; font-size: 1rem;">{{ stock.current_price | inr }}</span>
+                </td>
+                <td>
+                  <span class="{{ 'badge-positive' if stock.change_pct >= 0 else 'badge-negative' }}">
+                    {{ '+' if stock.change_pct >= 0 else '' }}{{ stock.change_pct }}%
+                  </span>
+                </td>
+                <td style="font-size: 0.8125rem; color: var(--text-muted);">
+                  {{ stock.day_low | inr }} - {{ stock.day_high | inr }}
+                </td>
+                <td style="text-align: right;">
+                  <a href="{{ url_for('stock_detail', symbol=stock.symbol) }}" class="btn btn-sm btn-primary">
+                    Trade
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Platform Value Props -->
+  <section style="margin-bottom: 4rem;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">Why Learn With TrendCore?</h2>
+    
+    <div class="tc-grid-3">
+      <div class="tc-card">
+        <div style="font-size: 2.25rem; margin-bottom: 1rem;">🛡️</div>
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem;">Zero Financial Risk</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          Trade with ₹10,00,000 in virtual paper currency. Master the mechanics of Indian financial markets without risking a single rupee of real capital.
+        </p>
+      </div>
+
+      <div class="tc-card">
+        <div style="font-size: 2.25rem; margin-bottom: 1rem;">📊</div>
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem;">Interactive Multi-Timeframe Charts</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          Examine market price trends across 1D, 1W, 1M, 3M, 6M, 1Y, and 5Y horizons with responsive chart analytics and instant volume indicators.
+        </p>
+      </div>
+
+      <div class="tc-card">
+        <div style="font-size: 2.25rem; margin-bottom: 1rem;">🎓</div>
+        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem;">TrendCore Learn Academy</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          Master stock market fundamentals, understand the difference between Market and Limit orders, grasp SIPs, and learn disciplined risk management.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}TrendCore | Admin Control Dashboard{% endblock %}
+
+{% block content %}
+<div class="tc-container" style="padding-top: 1.5rem;">
+
+  <!-- Admin Header -->
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span style="font-size: 0.75rem; font-weight: 800; color: var(--brand-cyan); background: var(--brand-cyan-light); padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">
+          ADMINISTRATOR PRIVILEGES
+        </span>
+      </div>
+      <h1 style="font-size: 1.875rem;">TrendCore Management Dashboard</h1>
+      <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+        Real-time platform metrics, user registry, trading volume, and market simulation controls.
+      </p>
+    </div>
+  </div>
+
+  <!-- Key Metrics 4-Grid -->
+  <div class="tc-grid-4" style="margin-bottom: 2rem;">
+    <div class="tc-card tc-stat-card">
+      <div class="label">Total Users</div>
+      <div class="value" style="color: var(--brand-accent);">{{ total_users }}</div>
+      <div class="sub-value" style="color: var(--text-muted);">Active registered accounts</div>
+    </div>
+
+    <div class="tc-card tc-stat-card">
+      <div class="label">Total Paper Trades</div>
+      <div class="value">{{ total_trades }}</div>
+      <div class="sub-value" style="color: var(--text-secondary);">
+        <span>{{ buy_trades }} Buy / {{ sell_trades }} Sell</span>
+      </div>
+    </div>
+
+    <div class="tc-card tc-stat-card">
+      <div class="label">Total Simulated Volume</div>
+      <div class="value" style="font-size: 1.45rem;">{{ total_virtual_volume | inr_compact }}</div>
+      <div class="sub-value" style="color: var(--text-muted);">Cumulative order turnover</div>
+    </div>
+
+    <div class="tc-card tc-stat-card">
+      <div class="label">Virtual Money In Pool</div>
+      <div class="value" style="font-size: 1.45rem; color: var(--positive);">{{ total_user_balance | inr_compact }}</div>
+      <div class="sub-value" style="color: var(--positive);">Total user cash holdings</div>
+    </div>
+  </div>
+
+  <!-- Analytics Charts Grid -->
+  <div class="tc-grid-2" style="margin-bottom: 2.5rem;">
+    <!-- Buy vs Sell Order Distribution -->
+    <div class="tc-card">
+      <h2 style="font-size: 1.125rem; margin-bottom: 1rem;">Order Flow Breakdown (Buy vs Sell)</h2>
+      <div style="position: relative; height: 250px;">
+        <canvas id="orderFlowChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Most Traded Stocks Volume -->
+    <div class="tc-card">
+      <h2 style="font-size: 1.125rem; margin-bottom: 1rem;">Top Traded Equities</h2>
+      <div style="position: relative; height: 250px;">
+        <canvas id="mostTradedChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage Stock Prices Simulation Panel -->
+  <div class="tc-card" style="margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.125rem; margin-bottom: 0.5rem;">Live Market Price Override (Simulation Control)</h2>
+    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+      Manually adjust any stock's current price to trigger limit orders or test volatility responses.
+    </p>
+
+    <form method="POST" action="{{ url_for('admin_update_stock') }}" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+      <div class="form-group" style="margin: 0; min-width: 200px;">
+        <label class="form-label">Select Stock</label>
+        <select name="symbol" class="form-control" required>
+          {% for s in stocks_list %}
+            <option value="{{ s.symbol }}">{{ s.symbol }} (Current: {{ s.current_price | inr }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group" style="margin: 0; min-width: 180px;">
+        <label class="form-label">New Simulated Price (₹)</label>
+        <input type="number" step="0.05" name="price" class="form-control" placeholder="1450.00" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="height: 42px;">
+        Update Price & Broadcast
+      </button>
+    </form>
+  </div>
+
+  <!-- Users List Table -->
+  <div class="tc-card" style="padding: 0; overflow: hidden; margin-bottom: 2.5rem;">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 1.125rem; margin: 0;">Registered Traders ({{ users_list | length }})</h2>
+      <span style="font-size: 0.8125rem; color: var(--text-muted);">All users pre-credited with ₹10 Lakh</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="tc-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Available Paper Cash</th>
+            <th>Role</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users_list %}
+            <tr>
+              <td style="font-weight: 700;">#{{ u.id }}</td>
+              <td style="font-weight: 600;">{{ u.name }}</td>
+              <td>{{ u.email }}</td>
+              <td style="color: var(--text-muted);">{{ u.mobile or '—' }}</td>
+              <td style="font-weight: 700; color: var(--positive);">{{ u.virtual_balance | inr }}</td>
+              <td>
+                {% if u.is_admin %}
+                  <span style="background: var(--brand-cyan-light); color: var(--brand-primary); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">ADMIN</span>
+                {% else %}
+                  <span style="background: var(--bg-surface-secondary); color: var(--text-secondary); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">TRADER</span>
+                {% endif %}
+              </td>
+              <td style="font-size: 0.75rem; color: var(--text-muted);">{{ u.created_at[:10] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Global Platform Orders Table -->
+  <div class="tc-card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 1.125rem; margin: 0;">Recent Platform-Wide Orders</h2>
+      <span style="font-size: 0.8125rem; color: var(--text-muted);">Latest simulation transactions</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="tc-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Trader</th>
+            <th>Stock</th>
+            <th>Action</th>
+            <th>Type</th>
+            <th>Qty</th>
+            <th>Execution Price</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in all_orders %}
+            <tr>
+              <td style="font-family: monospace; font-weight: 700; font-size: 0.8125rem;">{{ o.order_code }}</td>
+              <td style="font-weight: 600;">{{ o.user_name }}</td>
+              <td style="font-weight: 700; color: var(--brand-accent);">{{ o.stock_symbol }}</td>
+              <td>
+                <span class="{{ 'badge-positive' if o.action == 'BUY' else 'badge-negative' }}">
+                  {{ o.action }}
+                </span>
+              </td>
+              <td>{{ o.order_type }}</td>
+              <td style="font-weight: 700;">{{ o.quantity }}</td>
+              <td>{{ o.price | inr }}</td>
+              <td style="font-weight: 700;">{{ o.total_amount | inr }}</td>
+              <td>
+                {% if o.status == 'COMPLETED' %}
+                  <span class="badge-positive">COMPLETED</span>
+                {% elif o.status == 'OPEN' %}
+                  <span style="background: var(--brand-cyan-light); color: var(--brand-primary); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">OPEN</span>
+                {% else %}
+                  <span style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">CANCELLED</span>
+                {% endif %}
+              </td>
+              <td style="font-size: 0.75rem; color: var(--text-muted);">{{ o.created_at }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Buy vs Sell Doughnut Chart
+    const flowCtx = document.getElementById('orderFlowChart');
+    if (flowCtx) {
+      new Chart(flowCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Buy Orders', 'Sell Orders'],
+          datasets: [{
+            data: [{{ buy_trades }}, {{ sell_trades }}],
+            backgroundColor: ['#10b981', '#ef4444'],
+            borderWidth: 2,
+            borderColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#111827' : '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    // Most Traded Stocks Bar Chart
+    const mostCtx = document.getElementById('mostTradedChart');
+    if (mostCtx) {
+      const symbols = [{% for m in most_traded %}"{{ m.stock_symbol }}",{% endfor %}];
+      const counts = [{% for m in most_traded %}{{ m.trades }},{% endfor %}];
+
+      new Chart(mostCtx, {
+        type: 'bar',
+        data: {
+          labels: symbols.length ? symbols : ['RELIANCE', 'TCS', 'INFY'],
+          datasets: [{
+            label: 'Trades Executed',
+            data: counts.length ? counts : [12, 8, 5],
+            backgroundColor: '#2563eb',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+            y: { grid: { color: 'rgba(148, 163, 184, 0.15)' }, ticks: { color: '#94a3b8', stepSize: 1 } }
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}
